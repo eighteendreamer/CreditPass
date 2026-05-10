@@ -59,7 +59,7 @@ export default function BugReportEntry() {
       <button
         type="button"
         onClick={handleOpen}
-        className="fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-4 py-3 text-sm font-medium text-primary shadow-lg shadow-primary/10 transition hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary-50 sm:bottom-6 sm:right-6"
+        className="fixed bottom-4 right-4 z-30 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-3 py-2 text-sm font-medium text-primary shadow-lg shadow-primary/10 transition hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary-50 sm:bottom-6 sm:right-6 sm:px-4 sm:py-3"
       >
         <Bug size={18} />
         提 Bug
@@ -68,7 +68,7 @@ export default function BugReportEntry() {
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-40 bg-black/30 animate-fade-in" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-40 w-[92%] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl animate-fade-in">
+          <Dialog.Content className="fixed inset-x-4 bottom-4 top-4 z-40 overflow-auto rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl animate-fade-in sm:left-1/2 sm:right-auto sm:top-1/2 sm:w-[92%] sm:max-w-2xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:p-6">
             <div className="mb-5 flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary">
@@ -117,9 +117,6 @@ export default function BugReportEntry() {
                   placeholder="例如：首页活动筛选结果不正确"
                   maxLength={80}
                 />
-                <p className="mt-2 text-xs text-gray-500">
-                  用一句话概括问题，方便开发者快速判断。
-                </p>
               </section>
 
               <section className="rounded-xl border border-gray-200 bg-gray-50/80 p-4">
@@ -134,21 +131,18 @@ export default function BugReportEntry() {
                   placeholder="请描述你做了什么、出现了什么问题，最好补充复现步骤。"
                   maxLength={2000}
                 />
-                <p className="mt-2 text-xs leading-5 text-gray-500">
-                  建议按“操作步骤 / 实际结果 / 预期结果”的格式填写，这样更容易排查。
-                </p>
               </section>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <Dialog.Close className="btn-outline min-w-24" disabled={submitting}>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Dialog.Close className="btn-outline sm:min-w-24" disabled={submitting}>
                 取消
               </Dialog.Close>
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="btn-primary min-w-36 disabled:cursor-not-allowed disabled:opacity-60"
+                className="btn-primary sm:min-w-36 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting ? (
                   <span className="inline-flex items-center gap-2">

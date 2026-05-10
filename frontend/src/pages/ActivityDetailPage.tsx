@@ -8,6 +8,7 @@ import { formatDateTime } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 import * as Dialog from '@radix-ui/react-dialog'
 import { toast } from 'sonner'
+import { toPreviewUrl } from '@/lib/media'
 
 const FIXED_TIME_LABELS: Record<string, string> = {
   signupStartTime: '报名开始',
@@ -95,7 +96,7 @@ export default function ActivityDetailPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-6 py-16 text-center text-gray-500 text-sm">
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center text-sm text-gray-500 sm:px-6">
         加载中...
       </div>
     )
@@ -103,14 +104,14 @@ export default function ActivityDetailPage() {
 
   if (!data) {
     return (
-      <div className="mx-auto max-w-3xl px-6 py-16 text-center text-gray-500 text-sm">
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center text-sm text-gray-500 sm:px-6">
         活动不存在
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
       <button
         className="btn-ghost -ml-2 mb-4"
         onClick={() => navigate(-1)}
@@ -119,10 +120,10 @@ export default function ActivityDetailPage() {
         返回
       </button>
 
-      <div className="flex items-start justify-between gap-4 mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">{data.title}</h1>
-          <div className="flex items-center gap-2 flex-wrap">
+          <h1 className="mb-2 text-2xl font-semibold text-gray-900">{data.title}</h1>
+          <div className="flex flex-wrap items-center gap-2">
             <span className="chip">
               {data.creditType} +{data.creditAmount}
             </span>
@@ -137,9 +138,9 @@ export default function ActivityDetailPage() {
             {data.category === 'limited' && <span className="chip-muted">限时活动</span>}
           </div>
         </div>
-        <button className="btn-primary" onClick={() => setDrawerOpen(true)}>
+        <button className="btn-primary w-full sm:w-auto" onClick={() => setDrawerOpen(true)}>
           <Mail size={16} className="mr-1" />
-          联系发布员
+          联系发布人
         </button>
       </div>
 
@@ -172,14 +173,14 @@ export default function ActivityDetailPage() {
             ))}
           </ul>
         ) : (
-          <ul className="text-sm text-gray-700 space-y-2">
+          <ul className="space-y-2 text-sm text-gray-700">
             {(data.stageTimes || []).map((s, i) => (
               <li key={i} className="border-l-2 border-primary pl-3">
                 <div className="font-medium">{s.name}</div>
-                <div className="text-gray-500 text-xs">
+                <div className="text-xs text-gray-500">
                   {formatDateTime(s.start)} ~ {formatDateTime(s.end)}
                 </div>
-                {s.desc && <div className="text-gray-600 mt-1">{s.desc}</div>}
+                {s.desc && <div className="mt-1 text-gray-600">{s.desc}</div>}
               </li>
             ))}
             {(!data.stageTimes || data.stageTimes.length === 0) && <span>暂无阶段</span>}
@@ -206,7 +207,7 @@ export default function ActivityDetailPage() {
             href={data.activityUrl}
             target="_blank"
             rel="noreferrer"
-            className="text-primary text-sm inline-flex items-center gap-1 hover:underline"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
           >
             {data.activityUrl}
             <ExternalLink size={14} />
@@ -216,13 +217,13 @@ export default function ActivityDetailPage() {
 
       {!!(data.proofImages && data.proofImages.length) && (
         <Section title="证明截图">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {data.proofImages.map((url, i) => (
-              <a key={i} href={url} target="_blank" rel="noreferrer">
+              <a key={i} href={toPreviewUrl(url)} target="_blank" rel="noreferrer">
                 <img
-                  src={url}
+                  src={toPreviewUrl(url)}
                   alt=""
-                  className="w-full h-32 object-cover rounded-md border border-gray-200"
+                  className="h-32 w-full rounded-md border border-gray-200 object-cover"
                 />
               </a>
             ))}
@@ -234,14 +235,13 @@ export default function ActivityDetailPage() {
         <p className="text-sm text-gray-700">{data.publisherEmail}</p>
       </Section>
 
-      {/* 联系发布员抽屉 */}
       <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/40 z-50 animate-fade-in" />
-          <Dialog.Content className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white shadow-xl p-6 animate-fade-in overflow-auto">
-            <Dialog.Title className="text-lg font-semibold mb-1">联系发布员</Dialog.Title>
-            <Dialog.Description className="text-sm text-gray-500 mb-4">
-              咨询内容会通过邮件发送给活动发布人,发布人可以直接回复你的邮箱
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 animate-fade-in" />
+          <Dialog.Content className="fixed bottom-0 right-0 top-0 z-50 w-full max-w-md overflow-auto bg-white p-4 shadow-xl animate-fade-in sm:p-6">
+            <Dialog.Title className="mb-1 text-lg font-semibold">联系发布人</Dialog.Title>
+            <Dialog.Description className="mb-4 text-sm text-gray-500">
+              咨询内容会通过邮件发送给活动发布人，发布人可以直接回复你的邮箱。
             </Dialog.Description>
 
             <div className="space-y-3">
@@ -255,19 +255,19 @@ export default function ActivityDetailPage() {
               </div>
               <div>
                 <label className="form-label">你的邮箱</label>
-                <div className="text-sm text-gray-900">{user?.email || '(登录后自动填写)'}</div>
+                <div className="text-sm text-gray-900">{user?.email || '登录后自动填写'}</div>
               </div>
               <div>
                 <label className="form-label">咨询内容</label>
                 <textarea
                   className="form-textarea"
                   rows={5}
-                  placeholder="例如:想了解活动的具体报名流程"
+                  placeholder="例如：想了解活动的具体报名流程"
                   value={msg}
                   onChange={(e) => setMsg(e.target.value)}
                 />
               </div>
-              <div className="flex gap-2 pt-2">
+              <div className="flex flex-col gap-2 pt-2 sm:flex-row">
                 <button className="btn-outline flex-1" onClick={() => setDrawerOpen(false)}>
                   取消
                 </button>
@@ -289,8 +289,8 @@ export default function ActivityDetailPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="py-5 border-t border-gray-200">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">{title}</h3>
+    <section className="border-t border-gray-200 py-5">
+      <h3 className="mb-3 text-sm font-semibold text-gray-900">{title}</h3>
       {children}
     </section>
   )

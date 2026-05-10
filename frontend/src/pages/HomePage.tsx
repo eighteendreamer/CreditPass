@@ -116,16 +116,17 @@ export default function HomePage() {
   }, [token])
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8">
-      <div className="mb-6">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-5 sm:mb-6">
         <h1 className="mb-1 text-xl font-semibold text-gray-900">最新学分活动</h1>
-        <p className="text-sm text-gray-500">按你缺少的学分类型订阅推送符合条件的活动</p>
+        <p className="text-sm text-gray-500">按你缺少的学分类型筛选活动，手机上也能顺手浏览和报名</p>
       </div>
 
-      <div className="mb-6 space-y-4">
+      <div className="mb-6 space-y-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
-            className="form-input pl-11"
+            className="form-input pl-10"
             placeholder="搜索活动名称 / 简介"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -164,17 +165,17 @@ export default function HomePage() {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
             {CATEGORIES.map((item) => (
               <button
                 key={item.key}
                 onClick={() => setCategory(item.key)}
                 className={
-                  'rounded-md px-3 py-1 text-sm transition-colors ' +
+                  'rounded-full border px-3 py-1 text-sm transition-colors ' +
                   (category === item.key
-                    ? 'font-medium text-primary'
-                    : 'text-gray-600 hover:text-primary')
+                    ? 'border-primary bg-primary-50 font-medium text-primary'
+                    : 'border-gray-200 text-gray-600 hover:border-primary hover:text-primary')
                 }
               >
                 {item.label}
@@ -194,33 +195,33 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="border-t border-gray-200">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         {loading && (
           <div className="py-16 text-center text-sm text-gray-500">加载中...</div>
         )}
 
         {!loading && records.length === 0 && (
           <div className="py-16 text-center text-sm text-gray-500">
-            暂无活动，试着换个筛选条件。
+            暂无活动，试试换个搜索或筛选条件。
           </div>
         )}
 
         {records.map((activity) => (
           <div
             key={activity.id}
-            className="divider-row flex items-start justify-between gap-6 px-1 py-4"
+            className="divider-row flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
             onClick={() => navigate(`/activities/${activity.id}`)}
           >
             <div className="min-w-0 flex-1">
-              <div className="mb-1 flex items-center gap-2">
-                <h3 className="truncate text-base font-medium text-gray-900">{activity.title}</h3>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <h3 className="min-w-0 flex-1 text-base font-medium text-gray-900 sm:truncate">{activity.title}</h3>
                 <span className="chip">
                   {activity.creditType} +{activity.creditAmount}
                 </span>
                 {activity.category === 'limited' && <span className="chip-muted">限时</span>}
               </div>
 
-              <p className="line-clamp-2 text-sm text-gray-500">
+              <p className="line-clamp-3 text-sm text-gray-500 sm:line-clamp-2">
                 {activity.summary || activity.content || '暂无介绍'}
               </p>
 
@@ -229,7 +230,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="shrink-0 text-right">
+            <div className="flex items-center justify-between gap-4 sm:block sm:shrink-0 sm:text-right">
               <span
                 className={
                   'text-sm font-medium ' + (activity.available ? 'text-primary' : 'text-gray-400')
@@ -237,7 +238,7 @@ export default function HomePage() {
               >
                 {activity.availableText}
               </span>
-              <div className="mt-1 text-xs text-gray-400">浏览 {activity.viewCount ?? 0}</div>
+              <div className="text-xs text-gray-400 sm:mt-1">浏览 {activity.viewCount ?? 0}</div>
             </div>
           </div>
         ))}

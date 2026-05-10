@@ -32,7 +32,7 @@ export default function LoginDialog() {
     setSending(true)
     try {
       await sendEmailCode(email)
-      toast.success('验证码已发送,请查收邮箱')
+      toast.success('验证码已发送，请查收邮箱')
       setCountdown(60)
     } finally {
       setSending(false)
@@ -55,9 +55,9 @@ export default function LoginDialog() {
   return (
     <Dialog.Root open={loginDialogOpen} onOpenChange={setLoginDialogOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/40 z-50 animate-fade-in" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 animate-fade-in">
-          <div className="flex items-center justify-between mb-4">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 animate-fade-in" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-4 shadow-xl animate-fade-in sm:p-6">
+          <div className="mb-4 flex items-center justify-between">
             <Dialog.Title className="text-lg font-semibold text-gray-900">
               邮箱验证码登录
             </Dialog.Title>
@@ -65,8 +65,8 @@ export default function LoginDialog() {
               <X size={18} />
             </Dialog.Close>
           </div>
-          <Dialog.Description className="text-sm text-gray-500 mb-4">
-            首次登录会自动创建账号,无需密码
+          <Dialog.Description className="mb-4 text-sm text-gray-500">
+            首次登录会自动创建账号，无需密码。
           </Dialog.Description>
 
           <div className="space-y-3">
@@ -82,7 +82,7 @@ export default function LoginDialog() {
             </div>
             <div>
               <label className="form-label">验证码</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <input
                   type="text"
                   inputMode="numeric"
@@ -97,13 +97,13 @@ export default function LoginDialog() {
                   onClick={handleSendCode}
                   disabled={countdown > 0 || sending}
                 >
-                  {countdown > 0 ? `${countdown} s` : sending ? '发送中...' : '获取验证码'}
+                  {countdown > 0 ? `${countdown}s` : sending ? '发送中...' : '获取验证码'}
                 </button>
               </div>
             </div>
 
             <button
-              className="btn-primary w-full mt-2"
+              className="btn-primary mt-2 w-full"
               onClick={handleLogin}
               disabled={loading}
             >

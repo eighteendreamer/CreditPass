@@ -10,6 +10,7 @@ import {
 import { uploadFile } from '@/api/file'
 import type { Activity, StageTime } from '@/types'
 import { toast } from 'sonner'
+import { toPreviewUrl } from '@/lib/media'
 
 interface FixedTimeItem {
   name: string
@@ -26,7 +27,6 @@ const SCOPE_OPTIONS = [
 
 function toLocalInput(s?: string) {
   if (!s) return ''
-  // 后端 yyyy-MM-dd HH:mm:ss -> yyyy-MM-ddTHH:mm
   return s.substring(0, 16).replace(' ', 'T')
 }
 
@@ -167,17 +167,22 @@ export default function ActivityPublishPage() {
       ...s,
       stageTimes: [...(s.stageTimes || []), { name: '', start: '', end: '', desc: '' }],
     }))
+
   const updateStage = (i: number, k: keyof StageTime, v: any) =>
     setForm((s) => ({
       ...s,
       stageTimes: (s.stageTimes || []).map((st, idx) => (idx === i ? { ...st, [k]: v } : st)),
     }))
+
   const removeStage = (i: number) =>
     setForm((s) => ({ ...s, stageTimes: (s.stageTimes || []).filter((_, idx) => idx !== i) }))
+
   const addFixedTimeItem = () =>
     setFixedTimeItems((items) => [...items, createEmptyFixedTimeItem()])
+
   const updateFixedTimeItem = (index: number, key: keyof FixedTimeItem, value: string) =>
     setFixedTimeItems((items) => items.map((item, i) => (i === index ? { ...item, [key]: value } : item)))
+
   const removeFixedTimeItem = (index: number) =>
     setFixedTimeItems((items) => items.filter((_, i) => i !== index))
 
@@ -202,7 +207,7 @@ export default function ActivityPublishPage() {
       form.timeType === 'fixed'
       && normalizedFixedTimeItems.some((item) => !item.name || !item.time)
     ) {
-      toast.error('请完整填写时间名称和时间')
+      toast.error('请完整填写时间节点名称和时间')
       return
     }
 
@@ -234,11 +239,10 @@ export default function ActivityPublishPage() {
           : fromLocalInput(form.activityEndTime as any),
       stageTimes:
         form.timeType === 'fixed'
-          ? normalizedFixedTimeItems
-              .map((item) => ({
-                name: item.name,
-                time: fromLocalInput(item.time),
-              }))
+          ? normalizedFixedTimeItems.map((item) => ({
+              name: item.name,
+              time: fromLocalInput(item.time),
+            }))
           : (form.stageTimes || []).map((s) => ({
               ...s,
               start: fromLocalInput(s.start),
@@ -262,8 +266,8 @@ export default function ActivityPublishPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8">
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+      <h1 className="mb-5 text-xl font-semibold text-gray-900 sm:mb-6">
         {isEdit ? '编辑活动' : '发布活动'}
       </h1>
 
@@ -300,7 +304,7 @@ export default function ActivityPublishPage() {
       </Section>
 
       <Section title="学分">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="学分类型">
             <div className="space-y-2">
               <input
@@ -322,9 +326,9 @@ export default function ActivityPublishPage() {
                       key={item}
                       type="button"
                       className={
-                        'px-3 py-1 text-xs rounded-full border transition-colors ' +
+                        'rounded-full border px-3 py-1 text-xs transition-colors ' +
                         (form.creditType === item
-                          ? 'border-primary text-primary bg-primary-50'
+                          ? 'border-primary bg-primary-50 text-primary'
                           : 'border-gray-200 text-gray-600 hover:border-primary hover:text-primary')
                       }
                       onClick={() => set('creditType', item)}
@@ -335,7 +339,7 @@ export default function ActivityPublishPage() {
                 </div>
               )}
               <p className="text-xs text-gray-400">
-                推荐项来自当前账号同学校已发布活动中的学分类型，仍可自行输入。
+                推荐项来自当前账号同学校已发布活动中的学分类型，也可自行输入。
               </p>
             </div>
           </Field>
@@ -352,16 +356,16 @@ export default function ActivityPublishPage() {
       </Section>
 
       <Section title="活动时间">
-        <div className="flex gap-2 mb-4">
+        <div className="mb-4 flex flex-wrap gap-2">
           {(['fixed', 'staged'] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => set('timeType', t)}
               className={
-                'px-3 py-1.5 rounded-md text-sm border transition-colors ' +
+                'rounded-full border px-3 py-1.5 text-sm transition-colors ' +
                 (form.timeType === t
-                  ? 'border-primary text-primary bg-primary-50'
+                  ? 'border-primary bg-primary-50 text-primary'
                   : 'border-gray-300 text-gray-700 hover:border-primary')
               }
             >
@@ -373,10 +377,10 @@ export default function ActivityPublishPage() {
         {form.timeType === 'fixed' ? (
           <div className="space-y-3">
             <p className="text-sm text-gray-500">
-              需要哪个时间节点就自己添加哪个，不预置固定项目。系统会优先用名称里带“活动结束”的节点判断状态；如果没有，就取最晚的一个时间节点。
+              手机端可以按需添加时间节点。系统会优先用名称里带“活动结束”的节点判断状态；如果没有，就取最晚的一个时间节点。
             </p>
             {!!fixedTimeItems.length && fixedTimeItems.map((item, index) => (
-              <div key={index} className="grid grid-cols-[220px_minmax(0,1fr)_auto] gap-3">
+              <div key={index} className="grid grid-cols-1 gap-3 sm:grid-cols-[220px_minmax(0,1fr)_auto]">
                 <input
                   className="form-input"
                   placeholder="时间名称"
@@ -389,7 +393,7 @@ export default function ActivityPublishPage() {
                   value={item.time}
                   onChange={(e) => updateFixedTimeItem(index, 'time', e.target.value)}
                 />
-                <button type="button" className="btn-ghost" onClick={() => removeFixedTimeItem(index)}>
+                <button type="button" className="btn-ghost justify-center sm:justify-start" onClick={() => removeFixedTimeItem(index)}>
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -399,7 +403,7 @@ export default function ActivityPublishPage() {
                 还没有时间节点，点击下方“添加时间节点”开始填写。
               </div>
             )}
-            <button type="button" className="btn-outline" onClick={addFixedTimeItem}>
+            <button type="button" className="btn-outline w-full sm:w-auto" onClick={addFixedTimeItem}>
               <Plus size={16} className="mr-1" />
               添加时间节点
             </button>
@@ -407,19 +411,19 @@ export default function ActivityPublishPage() {
         ) : (
           <div className="space-y-3">
             {(form.stageTimes || []).map((s, i) => (
-              <div key={i} className="border border-gray-200 rounded-md p-3 space-y-2">
-                <div className="flex gap-2">
+              <div key={i} className="space-y-2 rounded-xl border border-gray-200 p-3">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     className="form-input"
-                    placeholder="阶段名称(如 初赛)"
+                    placeholder="阶段名称（如 初赛）"
                     value={s.name}
                     onChange={(e) => updateStage(i, 'name', e.target.value)}
                   />
-                  <button type="button" className="btn-ghost" onClick={() => removeStage(i)}>
+                  <button type="button" className="btn-ghost justify-center sm:justify-start" onClick={() => removeStage(i)}>
                     <Trash2 size={16} />
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <input
                     type="datetime-local"
                     className="form-input"
@@ -441,7 +445,7 @@ export default function ActivityPublishPage() {
                 />
               </div>
             ))}
-            <button type="button" className="btn-outline" onClick={addStage}>
+            <button type="button" className="btn-outline w-full sm:w-auto" onClick={addStage}>
               <Plus size={16} className="mr-1" />
               添加阶段
             </button>
@@ -450,16 +454,16 @@ export default function ActivityPublishPage() {
       </Section>
 
       <Section title="参与范围">
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="mb-3 flex flex-wrap gap-2">
           {SCOPE_OPTIONS.map((o) => (
             <button
               key={o.key}
               type="button"
               onClick={() => set('scopeType', o.key)}
               className={
-                'px-3 py-1 text-sm rounded-full border transition-colors ' +
+                'rounded-full border px-3 py-1 text-sm transition-colors ' +
                 (form.scopeType === o.key
-                  ? 'border-primary text-primary bg-primary-50'
+                  ? 'border-primary bg-primary-50 text-primary'
                   : 'border-gray-200 text-gray-600 hover:border-primary hover:text-primary')
               }
             >
@@ -468,7 +472,7 @@ export default function ActivityPublishPage() {
           ))}
         </div>
         {form.scopeType !== 'all_school' && (
-          <Field label="范围说明(如学院名称、组织名称)">
+          <Field label="范围说明（如学院名称、组织名称）">
             <input
               className="form-input"
               value={form.scopeDescription || ''}
@@ -506,20 +510,20 @@ export default function ActivityPublishPage() {
         </Field>
 
         <Field label="证明截图">
-          <div className="grid grid-cols-3 gap-3 mb-3">
+          <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {(form.proofImages || []).map((url) => (
               <div key={url} className="relative">
-                <img src={url} alt="" className="w-full h-24 object-cover rounded-md border border-gray-200" />
+                <img src={toPreviewUrl(url)} alt="" className="h-24 w-full rounded-md border border-gray-200 object-cover" />
                 <button
                   type="button"
-                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center"
+                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white"
                   onClick={() => removeImage(url)}
                 >
                   <X size={12} />
                 </button>
               </div>
             ))}
-            <label className="h-24 border border-dashed border-gray-300 rounded-md flex items-center justify-center text-gray-400 text-sm cursor-pointer hover:border-primary hover:text-primary">
+            <label className="flex h-24 cursor-pointer items-center justify-center rounded-md border border-dashed border-gray-300 text-sm text-gray-400 hover:border-primary hover:text-primary">
               <input
                 type="file"
                 className="hidden"
@@ -533,7 +537,7 @@ export default function ActivityPublishPage() {
         </Field>
       </Section>
 
-      <div className="flex gap-2 pt-6">
+      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 bg-gradient-to-t from-white via-white/95 to-transparent px-4 pb-3 pt-6 sm:static sm:mx-0 sm:flex-row sm:bg-none sm:px-0 sm:pb-0">
         <button className="btn-outline flex-1" onClick={() => navigate(-1)}>
           取消
         </button>
@@ -556,8 +560,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="py-5 border-b border-gray-200">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">{title}</h3>
+    <section className="border-b border-gray-200 py-5">
+      <h3 className="mb-3 text-sm font-semibold text-gray-900">{title}</h3>
       {children}
     </section>
   )

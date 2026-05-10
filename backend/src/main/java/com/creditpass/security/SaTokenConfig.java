@@ -17,6 +17,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
     private static final Pattern PUBLIC_ACTIVITY_PATTERN =
             Pattern.compile("^/api/activities(?:/(\\d+|credit-types))?$");
+    private static final String FILE_PREVIEW_PATH = "/api/files/preview";
 
     private final RateLimitInterceptor rateLimitInterceptor;
 
@@ -34,6 +35,9 @@ public class SaTokenConfig implements WebMvcConfigurer {
                     return true;
                 }
                 if ("GET".equalsIgnoreCase(method) && PUBLIC_ACTIVITY_PATTERN.matcher(path).matches()) {
+                    return true;
+                }
+                if ("GET".equalsIgnoreCase(method) && FILE_PREVIEW_PATH.equals(path)) {
                     return true;
                 }
                 if ("OPTIONS".equalsIgnoreCase(method)) {

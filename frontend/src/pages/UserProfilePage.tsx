@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import type { CreditNeed, User } from '@/types'
 import { toast } from 'sonner'
 import { uploadFile } from '@/api/file'
+import { toPreviewUrl } from '@/lib/media'
 
 interface CreditNeedRow {
   type: string
@@ -58,6 +59,7 @@ export default function UserProfilePage() {
   const [form, setForm] = useState<Partial<User>>({})
   const [saving, setSaving] = useState(false)
   const [creditNeedRows, setCreditNeedRows] = useState<CreditNeedRow[]>([])
+  const [avatarBroken, setAvatarBroken] = useState(false)
 
   useEffect(() => {
     fetchMe()
@@ -67,6 +69,7 @@ export default function UserProfilePage() {
     if (user) {
       setForm(user)
       setCreditNeedRows(toCreditNeedRows(user.creditNeeds))
+      setAvatarBroken(false)
     }
   }, [user])
 
@@ -93,7 +96,7 @@ export default function UserProfilePage() {
       }))
 
     if (normalizedRows.some((row) => !row.type || !parseCreditProgress(row.progress))) {
-      toast.error('请完整填写学分类型和 当前学分/满学分')
+      toast.error('请完整填写学分类型和“当前学分/满学分”')
       return
     }
 
@@ -139,6 +142,7 @@ export default function UserProfilePage() {
     try {
       const r = await uploadFile(file)
       set('avatarUrl', r.data.url)
+      setAvatarBroken(false)
       toast.success('头像已上传，记得点击保存')
     } catch {
       /* handled */
@@ -147,31 +151,36 @@ export default function UserProfilePage() {
 
   if (!user) {
     return (
-      <div className="mx-auto max-w-2xl px-6 py-16 text-center text-gray-500 text-sm">
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center text-sm text-gray-500 sm:px-6">
         加载中...
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8">
-      <h1 className="text-xl font-semibold text-gray-900 mb-1">用户信息</h1>
-      <p className="text-sm text-gray-500 mb-6">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+      <h1 className="mb-1 text-xl font-semibold text-gray-900">用户信息</h1>
+      <p className="mb-6 text-sm text-gray-500">
         填写越完整，越能推送到你真正还缺的学分活动
       </p>
 
       <FormSection title="基础信息">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
-            {form.avatarUrl ? (
-              <img src={form.avatarUrl} alt="" className="w-full h-full object-cover" />
+        <div className="mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-100">
+            {form.avatarUrl && !avatarBroken ? (
+              <img
+                src={toPreviewUrl(form.avatarUrl)}
+                alt=""
+                className="h-full w-full object-cover"
+                onError={() => setAvatarBroken(true)}
+              />
             ) : (
               <span className="text-xl text-gray-400">
                 {(form.nickname || form.email || '?').charAt(0).toUpperCase()}
               </span>
             )}
           </div>
-          <label className="btn-outline cursor-pointer">
+          <label className="btn-outline w-full cursor-pointer sm:w-auto">
             上传头像
             <input type="file" className="hidden" accept="image/*" onChange={handleAvatar} />
           </label>
@@ -197,7 +206,7 @@ export default function UserProfilePage() {
       </FormSection>
 
       <FormSection title="学校信息">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="学校">
             <input
               className="form-input"
@@ -241,7 +250,7 @@ export default function UserProfilePage() {
               onChange={(e) => set('className', e.target.value)}
             />
           </Field>
-          <Field label="学号(可选)">
+          <Field label="学号（可选）">
             <input
               className="form-input"
               value={form.studentNo || ''}
@@ -260,7 +269,7 @@ export default function UserProfilePage() {
       </FormSection>
 
       <FormSection title="学分需求">
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="mb-3 text-sm text-gray-500">
           由你自己填写还缺哪些学分，并按“当前学分/满学分”格式录入，系统会优先推送对应类型的活动
         </p>
 
@@ -331,7 +340,7 @@ export default function UserProfilePage() {
         />
       </FormSection>
 
-      <div className="sticky bottom-0 bg-gradient-to-t from-white via-white/95 to-transparent pt-6 pb-2 -mx-6 px-6">
+      <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-white via-white/95 to-transparent px-4 pb-3 pt-6 sm:-mx-6 sm:px-6 sm:pb-2">
         <button className="btn-primary w-full" onClick={handleSave} disabled={saving}>
           {saving ? '保存中...' : '保存'}
         </button>
@@ -351,8 +360,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="py-5 border-b border-gray-200">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">{title}</h3>
+    <section className="border-b border-gray-200 py-5">
+      <h3 className="mb-3 text-sm font-semibold text-gray-900">{title}</h3>
       {children}
     </section>
   )
@@ -368,11 +377,11 @@ function ToggleRow({
   onChange: (v: boolean) => void
 }) {
   return (
-    <label className="flex items-center justify-between py-2 text-sm text-gray-700 cursor-pointer">
+    <label className="flex cursor-pointer items-center justify-between gap-4 py-2 text-sm text-gray-700">
       <span>{label}</span>
       <input
         type="checkbox"
-        className="accent-primary w-4 h-4"
+        className="h-4 w-4 shrink-0 accent-primary"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />

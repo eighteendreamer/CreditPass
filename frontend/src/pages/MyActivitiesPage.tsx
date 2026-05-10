@@ -26,7 +26,7 @@ export default function MyActivitiesPage() {
   }, [])
 
   const handleDelete = async (a: Activity) => {
-    if (!confirm(`确定删除活动《${a.title}》?此操作不可恢复`)) return
+    if (!confirm(`确定删除活动“${a.title}”吗？此操作不可恢复`)) return
     await deleteActivity(a.id)
     toast.success('已删除')
     load()
@@ -38,27 +38,27 @@ export default function MyActivitiesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold text-gray-900">我的发布</h1>
-        <button className="btn-primary" onClick={() => navigate('/publish')}>
+        <button className="btn-primary w-full sm:w-auto" onClick={() => navigate('/publish')}>
           发布新活动
         </button>
       </div>
 
-      <div className="border-t border-gray-200">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         {loading && <div className="py-16 text-center text-sm text-gray-500">加载中...</div>}
         {!loading && list.length === 0 && (
           <div className="py-16 text-center text-sm text-gray-500">
-            你还没有发布过活动,点击右上角开始发布
+            你还没有发布过活动，点击上方按钮开始创建吧。
           </div>
         )}
         {list.map((a) => (
-          <div key={a.id} className="py-4 border-b border-gray-200 flex items-start gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+          <div key={a.id} className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 last:border-b-0 sm:flex-row sm:items-start sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
                 <h3
-                  className="text-base font-medium text-gray-900 truncate cursor-pointer hover:text-primary"
+                  className="min-w-0 flex-1 cursor-pointer text-base font-medium text-gray-900 hover:text-primary sm:truncate"
                   onClick={() => navigate(`/activities/${a.id}`)}
                 >
                   {a.title}
@@ -75,12 +75,12 @@ export default function MyActivitiesPage() {
                   {a.availableText}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 line-clamp-1">{a.summary || '暂无简介'}</p>
-              <p className="text-xs text-gray-400 mt-1">
-                结束:{formatDateTime(a.activityEndTime) || '未指定'} · 浏览 {a.viewCount ?? 0}
+              <p className="line-clamp-2 text-sm text-gray-500">{a.summary || '暂无简介'}</p>
+              <p className="mt-1 text-xs text-gray-400">
+                结束：{formatDateTime(a.activityEndTime) || '未指定'} · 浏览 {a.viewCount ?? 0}
               </p>
             </div>
-            <div className="shrink-0 flex items-center gap-1">
+            <div className="grid shrink-0 grid-cols-4 gap-2 sm:flex sm:items-center sm:gap-1">
               <button className="btn-ghost" onClick={() => navigate(`/activities/${a.id}`)}>
                 <Eye size={16} />
               </button>

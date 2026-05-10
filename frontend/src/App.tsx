@@ -39,44 +39,44 @@ export default function App() {
   }, [token])
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <SecurityGuard />
       <AppHeader />
-      <main className="flex-1 w-full">
+      <main className="w-full flex-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/activities/:id" element={<ActivityDetailPage />} />
           <Route
             path="/profile"
-            element={
+            element={(
               <RequireAuth>
                 <UserProfilePage />
               </RequireAuth>
-            }
+            )}
           />
           <Route
             path="/publish"
-            element={
+            element={(
               <RequireAuth>
                 <ActivityPublishPage />
               </RequireAuth>
-            }
+            )}
           />
           <Route
             path="/publish/:id"
-            element={
+            element={(
               <RequireAuth>
                 <ActivityPublishPage />
               </RequireAuth>
-            }
+            )}
           />
           <Route
             path="/my-activities"
-            element={
+            element={(
               <RequireAuth>
                 <MyActivitiesPage />
               </RequireAuth>
-            }
+            )}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -84,7 +84,7 @@ export default function App() {
       <BugReportEntry />
       <UsageNoticeDialog open={usageNoticeOpen} onOpenChange={setUsageNoticeOpen} />
       <LoginDialog />
-      <footer className="border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+      <footer className="border-t border-gray-200 px-4 py-5 text-center text-xs text-gray-500 sm:px-6 sm:py-6">
         CreditPass · 校园学分活动推送平台
       </footer>
     </div>

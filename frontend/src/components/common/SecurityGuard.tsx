@@ -8,7 +8,11 @@ declare global {
 }
 
 export default function SecurityGuard() {
+  const enabled = import.meta.env.VITE_ENABLE_DEVTOOL_GUARD !== 'false'
+
   useEffect(() => {
+    if (!enabled) return
+
     const onKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toUpperCase()
       const blocked =
@@ -61,7 +65,7 @@ export default function SecurityGuard() {
       window.removeEventListener('keydown', onKeyDown, true)
       window.removeEventListener('contextmenu', onContextMenu)
     }
-  }, [])
+  }, [enabled])
 
   return null
 }
