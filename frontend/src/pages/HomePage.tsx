@@ -124,7 +124,6 @@ export default function HomePage() {
 
       <div className="mb-6 space-y-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
             className="form-input pl-10"
             placeholder="搜索活动名称 / 简介"
